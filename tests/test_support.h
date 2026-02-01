@@ -72,13 +72,13 @@ namespace tests {
   static void T_CONCAT(test_fn_, ID)();                                       \
   namespace {                                                                 \
     struct T_CONCAT(test_reg_, ID) {                                          \
-      T_CONCAT(test_reg_, ID)() {                                               \
+      T_CONCAT(test_reg_, ID)() {                                             \
         ::tests::register_test((NAME), &T_CONCAT(test_fn_, ID));              \
       }                                                                       \
     };                                                                        \
-    static const T_CONCAT(test_req_, ID) T_CONCAT(test_reg_instance_, ID){};  \
+    static const T_CONCAT(test_reg_, ID) T_CONCAT(test_reg_instance_, ID){};  \
   }                                                                           \
-  static void T_CONCAT(test_fn_, ID)()                                            
+  static void T_CONCAT(test_fn_, ID)()   
   
 // ---------- Assertions / expectations ----------
 #define EXPECT_TRUE(EXPR)                                                     \
@@ -87,7 +87,7 @@ namespace tests {
       ::tests::fail("EXPECT_TRUE", #EXPR, __FILE__, __LINE__, __func__);      \
       ::tests::failures_in_current_test()++;                                  \
     }                                                                         \
-  } while (0)                                                                 
+  } while (0)
 
 #define ASSERT_TRUE(EXPR)                                                     \
   do {                                                                        \
@@ -108,7 +108,7 @@ namespace tests {
                     _os.str());                                               \
       ::tests::failures_in_current_test()++;                                  \
     }                                                                         \
-  } while (0)                                                                 
+  } while (0)
 
 #define ASSERT_EQ(A, B)                                                       \
   do {                                                                        \
@@ -121,7 +121,7 @@ namespace tests {
                     _os.str());                                               \
       throw ::tests::TestFailure("ASSERT_EQ failed");                         \
     }                                                                         \
-  } while (0)                                                                 
+  } while (0)
 
 #define EXPECT_NEAR(A, B, EPS)                                                \
   do {                                                                        \

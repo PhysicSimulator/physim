@@ -11,7 +11,7 @@ option(PHYSIM_TESTING "Build tests" ON)
 
 # --------------- Library ---------------
 add_library(physim 
-  src/add.cpp  
+  src/units.cpp  
 )
 
 target_include_directories(physim PUBLIC 

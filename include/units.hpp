@@ -10,8 +10,6 @@ typedef double momentum;
 typedef double velocity;
 typedef double mass;
 
-int add(int a, int b);
-
 template<class T>
 class Unit {
 protected:
@@ -42,6 +40,7 @@ class Ekin : public Unit<energie> {
     using Unit<energie>::operator=;
     using Unit<energie>::operator*;
     using Unit<energie>::operator();
+    Ekin& classical_mechanic(mass m, velocity v);
 };
 
 class Momentum : public Unit<momentum> {
@@ -51,18 +50,18 @@ public:
   using Unit<momentum>::operator*;
   using Unit<momentum>::operator();
 };
-/*
-class Mass {
-  mass m;
 
-  const mass& operator*() const { return m; }
-  void operator=(mass&& m) { this->m = m; }
+class Mass : public Unit<mass> {
+  using Unit<mass>::Unit;
+  using Unit<mass>::operator=;
+  using Unit<mass>::operator*;
+  using Unit<mass>::operator();
 };
 
-class Velocity {
-  velocity v;
-
-  const velocity& operator*() const { return v; }
-  void operator=(velocity&& v) { this->v = v; }
+class Velocity : public Unit<velocity> {
+  using Unit<velocity>::Unit;
+  using Unit<velocity>::operator=;
+  using Unit<velocity>::operator*;
+  using Unit<velocity>::operator();
 };
-*/
+
