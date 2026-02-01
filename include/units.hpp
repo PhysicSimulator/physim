@@ -1,5 +1,4 @@
-#ifndef _UNITS_H_
-#define _UNITS_H_
+#pragma once
 
 #include <functional>
 #include <concepts>
@@ -23,8 +22,8 @@ public:
   explicit Unit(const T& value) : unit(value) {}
 
   const T& operator*() const { return unit; }
-  Unit& operator=(T unit) noexcept { 
-    this->unit = std::move<T>(unit);
+  Unit& operator=(T _unit) noexcept { 
+    this->unit = std::move<T>(_unit);
     return *this;
   }
 
@@ -52,7 +51,7 @@ public:
   using Unit<momentum>::operator*;
   using Unit<momentum>::operator();
 };
-
+/*
 class Mass {
   mass m;
 
@@ -66,5 +65,4 @@ class Velocity {
   const velocity& operator*() const { return v; }
   void operator=(velocity&& v) { this->v = v; }
 };
-
-#endif
+*/
