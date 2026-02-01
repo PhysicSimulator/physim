@@ -62,16 +62,31 @@ namespace tests {
   inline int current_test_failure() { return failures_in_current_test(); }
 }
 
+// --- token concatenation helpers (2-step expansion) ---
+#define T_CONCAT_IMPL(a, b) a##b
+#define T_CONCAT(a, b) T_CONCAT_IMPL(a, b)
+
+// --- unique id ---
+# if defined(__COUNTER__)
+  #define T_UNIQUE_ID __COUNTER__
+#else
+  #define T_UNIQUE_ID __LINE__
+#endif
 
 // ---------- Test registration ----------
-#define TEST_CASE(NAME)                                                       \
-  static void test_fn_##__LINE__();                                           \
-  struct test_reg_##__LINE__ {                                                \
-    test_reg_##__LINE__() {                                                   \
-      ::tests::register_test((NAME), &test_fn_##__LINE__);                     \
-    }                                                                         \
-  } test_reg_instance_##__LINE__;                                             \
-  static void test_fn_##__LINE__()                                            \
+#define TEST_CASE(NAME) TEST_CASE_IMPL(NAME, T_UNIQUE_ID)
+
+#define TEST_CASE_IMPL(NAME, ID)                                                       \
+  static void T_CONCAT(test_fn_, ID)();                                           \
+  namespace {                                                                     \
+    struct T_CONCAT(test_reg_, T_UNIQUE_ID) {                                                \
+      T_CONCAT(test_reg_, ID) {                                                   \
+        ::tests::register_test((NAME), &T_CONCAT(test_fn_, ID));                     \
+      }                                                                         \
+    };                                             \
+    static const T_CONCAT(test_req_, ID) T_CONCAT(test_reg_instance_, ID){};  \
+  }
+  static void T_CONCAT(test_fn_, ID)()                                            \
   
 // ---------- Assertions / expectations ----------
 #define EXPECT_TRUE(EXPR)                                                     \
