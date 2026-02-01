@@ -1,13 +1,12 @@
 
 #pragma once
-#include <cstdlib>
+
 #include <exception>
 #include <functional>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <sys/types.h>
 #include <utility>
 #include <vector>
 
@@ -66,36 +65,37 @@ namespace tests {
 #define T_CONCAT_IMPL(a, b) a##b
 #define T_CONCAT(a, b) T_CONCAT_IMPL(a, b)
 
-// --- unique id ---
-# if defined(__COUNTER__)
-  #define T_UNIQUE_ID __COUNTER__
-#else
-  #define T_UNIQUE_ID __LINE__
-#endif
-
 // ---------- Test registration ----------
-#define TEST_CASE(NAME) TEST_CASE_IMPL(NAME, T_UNIQUE_ID)
+#define TEST_CASE(NAME) TEST_CASE_IMPL(NAME, __COUNTER__)
 
-#define TEST_CASE_IMPL(NAME, ID)                                                       \
-  static void T_CONCAT(test_fn_, ID)();                                           \
-  namespace {                                                                     \
-    struct T_CONCAT(test_reg_, T_UNIQUE_ID) {                                                \
-      T_CONCAT(test_reg_, ID) {                                                   \
-        ::tests::register_test((NAME), &T_CONCAT(test_fn_, ID));                     \
-      }                                                                         \
-    };                                             \
+#define TEST_CASE_IMPL(NAME, ID)                                              \
+  static void T_CONCAT(test_fn_, ID)();                                       \
+  namespace {                                                                 \
+    struct T_CONCAT(test_reg_, ID) {                                          \
+      T_CONCAT(test_reg_, ID)() {                                               \
+        ::tests::register_test((NAME), &T_CONCAT(test_fn_, ID));              \
+      }                                                                       \
+    };                                                                        \
     static const T_CONCAT(test_req_, ID) T_CONCAT(test_reg_instance_, ID){};  \
-  }
-  static void T_CONCAT(test_fn_, ID)()                                            \
+  }                                                                           \
+  static void T_CONCAT(test_fn_, ID)()                                            
   
 // ---------- Assertions / expectations ----------
 #define EXPECT_TRUE(EXPR)                                                     \
   do {                                                                        \
     if (!(EXPR)) {                                                            \
-      ::tests::fail("EXPECT_TRUE", #EXPR, __FILE__, __LINE__, __func__);       \
-      ::tests::failures_in_current_test()++;                                   \
+      ::tests::fail("EXPECT_TRUE", #EXPR, __FILE__, __LINE__, __func__);      \
+      ::tests::failures_in_current_test()++;                                  \
     }                                                                         \
-  } while (0)                                                                 \
+  } while (0)                                                                 
+
+#define ASSERT_TRUE(EXPR)                                                     \
+  do {                                                                        \
+    if (!(EXPR)) {                                                            \
+      ::tests::fail("ASSERT_TRUE". #EXPR, __FILE__, __LINE__, __func__);      \
+      throw ::tests::TestFailure("ASSERT_TRUE failed");                       \
+    }                                                                         \
+  } while (0)
 
 #define EXPECT_EQ(A, B)                                                       \
   do {                                                                        \
@@ -104,11 +104,11 @@ namespace tests {
     if (!(_a == _b)) {                                                        \
       std::ostringstream _os;                                                 \
       _os << "lhs=" << _a << " rhs=" << _b;                                   \
-      ::tests::fail("EXPECT_EQ", #A " == " #B, __FILE__, __LINE__, __func__    \
+      ::tests::fail("EXPECT_EQ", #A " == " #B, __FILE__, __LINE__, __func__,  \
                     _os.str());                                               \
-      ::tests::failures_in_current_test()++;                                   \
+      ::tests::failures_in_current_test()++;                                  \
     }                                                                         \
-  } while (0)                                                                 \
+  } while (0)                                                                 
 
 #define ASSERT_EQ(A, B)                                                       \
   do {                                                                        \
@@ -117,11 +117,11 @@ namespace tests {
     if (!(_a == _b)) {                                                        \
       std::ostringstream _os;                                                 \
       _os << "lhs=" << _a << " rhs=" << _b;                                   \
-      ::tests::fail("ASSERT_EQ", #A " == " #B, __FILE__, __LINE__, __func__,   \
+      ::tests::fail("ASSERT_EQ", #A " == " #B, __FILE__, __LINE__, __func__,  \
                     _os.str());                                               \
-      throw ::tests::TestFailure("ASSERT_EQ failed");                          \
+      throw ::tests::TestFailure("ASSERT_EQ failed");                         \
     }                                                                         \
-  } while (0)                                                                 \
+  } while (0)                                                                 
 
 #define EXPECT_NEAR(A, B, EPS)                                                \
   do {                                                                        \
@@ -131,11 +131,11 @@ namespace tests {
     if (!(((_a > _b) ? (_a - _b) : (_b - _a)) <= _e)) {                       \
       std::ostringstream _os;                                                 \
       _os << "lhs=" << _a << " rhs=" << _b << " eps=" << _e;                  \
-      ::tests::fail("EXPECT_NEAR", #A " ~= " #B, __FILE__, __LINE__, __func__, \
+      ::tests::fail("EXPECT_NEAR", #A " ~= " #B, __FILE__, __LINE__, __func__,\
                     _os.str());                                               \
-      ::tests::failures_in_current_test()++;                                   \
+      ::tests::failures_in_current_test()++;                                  \
     }                                                                         \
-  } while (0)                                                                 \
+  } while (0)
 
 // Expect that a expression throws some exception type
 #define EXPECT_THROWS_AS(EXPR, EXC_TYPE)                                      \
@@ -145,9 +145,9 @@ namespace tests {
     catch (const EXC_TYPE) { _thrown = true; }                                \
     catch (...) {}                                                            \
     if (!_thrown) {                                                           \
-      ::tests::fail(EXPECT_THROWS_AS, #EXPR, __FILE__, __LINE__, __func__,     \
+      ::tests::fail(EXPECT_THROWS_AS, #EXPR, __FILE__, __LINE__, __func__,    \
                     "did not throw " #EXC_TYPE);                              \
-      ::tests::failures_in_current_test()++;                                   \
+      ::tests::failures_in_current_test()++;                                  \
     }                                                                         \
   } while (0)
 

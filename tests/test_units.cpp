@@ -29,7 +29,7 @@ struct UnitTests {
   }
 };
 
-TEST_METHOD(UnitTests, default_construct_is_zero);
-TEST_METHOD(UnitTests, construct_from_value);
-TEST_METHOD(UnitTests, call_operator_assigns_from_invocable);
-TEST_METHOD(UnitTests, compile_time_properties);
+TEST_METHOD(UnitTests, default_construct_is_zero)
+TEST_METHOD(UnitTests, construct_from_value)
+TEST_METHOD(UnitTests, call_operator_assigns_from_invocable)
+TEST_METHOD(UnitTests, compile_time_properties)
