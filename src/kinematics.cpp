@@ -32,7 +32,7 @@ void kinematics::Collision::_1D_collision(si::Particle *p1, si::Particle *p2) {
   auto new_momentum = [](si::Particle *p) {
     return p->mass() * p->velocity();
   };
-  
+
   p1->set<si::velocity_t>() = res.v1;
   p2->set<si::velocity_t>() = res.v2;
 
