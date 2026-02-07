@@ -70,13 +70,8 @@ jobs:
 
       - name: Configure
         run: >
-<<<<<<< HEAD
           cmake -S . -B build
-          -G ninja
-=======
-          cmake -S -B build
           -G Ninja
->>>>>>> ci_worker
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DPHYSIM_TESTING=ON
           -DPHYSIM_WARNINGS_AS_ERRORS=ON
