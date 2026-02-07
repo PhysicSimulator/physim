@@ -74,7 +74,7 @@ jobs:
           -G ninja
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DPHYSIM_TESTING=ON
-          -DPHYSIM_WaRNINGS_AS_ERRORS=ON
+          -DPHYSIM_WARNINGS_AS_ERRORS=ON
           ${{ runner.os == 'Linux' && matrix.build_type == 'Debug' && '-DPHYSIM_ENABLE_SANITIZERS=ON' || '' }}
 
       - name: Build
