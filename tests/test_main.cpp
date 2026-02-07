@@ -2,7 +2,7 @@
 #include "test_support.h"
 
 int main() {
- 
+
   const auto& tests = tests::registry();
   std::cout << "Running " << tests.size() << " tests...\n";
 

@@ -19,7 +19,7 @@ public:
   Particle() = default;
   explicit Particle(Energie _e, mass_t _m, velocity_t _v, momentum_t _p)
     : e(_e), m(_m), v(_v), p(_p) {}
- 
+
   template<class U>
   inline U& set() {
     if constexpr (std::is_same_v<U, Energie>) {
