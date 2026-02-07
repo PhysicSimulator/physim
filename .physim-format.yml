@@ -1,0 +1,29 @@
+
+include:
+  - src
+  - include
+  - tests
+
+exclude:
+  - build
+  - .git
+  - third_party
+  - vendor
+  - external
+
+extensions:
+  - .h
+  - .hpp
+  - .hh
+  - .cpp
+  - .cc
+  - .c
+  - .cxx
+  - .inl
+  - .ipp
+
+rules:
+  max_line_length: 88
+  forbid_trailing_whitespaces: true
+  require_newline_at_eof: true
+  indent_multiple_of: 2

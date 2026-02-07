@@ -1,0 +1,85 @@
+
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Format check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Format check
+        run: python3 scripts/format_check.py
+
+  build-test:
+    name: Build & test (${{ matrix.os  }}, ${{ matrix.build_type }})
+    runs-on: ${{ matrix.os }}
+    needs: [ format ]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        build_type: [ Debug, Release ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build ccache
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install ninja ccache
+
+      - name: Configure CCache
+        shell: bash
+        run: |
+          echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESS=true" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-${{ matrix.build_type }}-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake', '**/*.h', '**/*.hpp', '**/*.cpp') }}
+          restore-keys:
+            ccache-${{ runner.os }}-${{ matrix.build_type }}-
+
+      - name: Configure
+        run: >
+          cmake -S -B build
+          -G ninja
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DPHYSIM_TESTING=ON
+          -DPHYSIM_WaRNINGS_AS_ERRORS=ON
+          ${{ runner.os == 'Linux' && matrix.build_type == 'Debug' && '-DPHYSIM_ENABLE_SANITIZERS=ON' || '' }}
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
