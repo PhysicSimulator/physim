@@ -2,7 +2,7 @@
 #include "test_support.h"
 
 int main() {
-  
+
   const auto& tests = tests::registry();
   std::cout << "Running " << tests.size() << " tests...\n";
 
@@ -18,7 +18,14 @@ int main() {
     } catch (const tests::TestFailure&) {
       // already logged; treated as failure
     } catch (const std::exception& e) {
-      tests::fail("UNCAUGHT std::exception", tc.name, __FILE__, __LINE__, __func__, e.what());
+      tests::fail(
+        "UNCAUGHT std::exception",
+        tc.name,
+        __FILE__,
+        __LINE__,
+        __func__,
+        e.what()
+      );
       tests::failures_in_current_test()++;
     } catch (...) {
       tests::fail("UNCAUGHT unknown", tc.name, __FILE__, __LINE__, __func__);

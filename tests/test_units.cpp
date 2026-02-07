@@ -52,7 +52,7 @@ public:
   void test_classical_mechanic() {
     EXPECT_NEAR(
         si::classical_mechanic(si::mass_t{10.0}, si::velocity_t{10.0}).raw(),
-        500.0, 
+        500.0,
         1e-12);
   }
 };

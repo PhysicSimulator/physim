@@ -20,8 +20,13 @@ public:
     _m = si::mass_t{10.0};
     _v = si::velocity_t{10.0};
     _p = si::momentum_t{100};
-    p1 = si::Particle(si::Energie(_E), si::mass_t(_m), si::velocity_t(_v), si::momentum_t(_p));
-    p2 = si::Particle(si::Energie(_E), si::mass_t(_m), si::velocity_t(_v), si::momentum_t(_p));
+    p1 = si::Particle(
+      si::Energie(_E),
+      si::mass_t(_m),
+      si::velocity_t(_v),
+      si::momentum_t(_p)
+    );
+    p2 = p1;
   }
 
   void test_1D_collision() {
@@ -31,6 +36,6 @@ public:
   }
 };
 
-} 
+}
 
 TEST_METHOD(TestKinematics::TestCollision, test_1D_collision)

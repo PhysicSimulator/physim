@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace tests {
-  
+
   struct TestCase {
     std::string name;
     std::function<void()> fn;
@@ -78,8 +78,8 @@ namespace tests {
     };                                                                        \
     static const T_CONCAT(test_reg_, ID) T_CONCAT(test_reg_instance_, ID){};  \
   }                                                                           \
-  static void T_CONCAT(test_fn_, ID)()   
-  
+  static void T_CONCAT(test_fn_, ID)()
+
 // ---------- Assertions / expectations ----------
 #define EXPECT_TRUE(EXPR)                                                     \
   do {                                                                        \
