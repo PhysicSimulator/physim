@@ -14,16 +14,38 @@ exclude:
 extensions:
   - .h
   - .hpp
-  - .hh
   - .cpp
-  - .cc
   - .c
-  - .cxx
-  - .inl
-  - .ipp
 
 rules:
   max_line_length: 88
   forbid_trailing_whitespaces: true
   require_newline_at_eof: true
+
+  # Indentation policy:
+  # - tabs only for indentation
+  # - treat 1 tab as 2 "indent columns"
+  # - indentation must be multiple of indent_multiple_of columns
+  indentation_tabs_only: true
+  tab_width: 2
   indent_multiple_of: 2
+
+  require_space_after_keywords: true
+  require_space_before_keywords: true
+  require_space_around_operators: true
+  require_space_around_braces: true
+
+  require_blank_line_before_includes: true
+  require_blank_line_after_includes: true
+  require_blank_lines_around_definitions: true
+
+  # Pointer/reference spacing
+  # allowed: "int *var", "int &var"
+  # forbidden: "int* var", "int& var"
+  pointer_reference_style: "type_space_starvar"
+
+  typedef_struct_suffix: "_t"
+  class_name_capitalized: true
+
+  license_require_substring: "GNU General Public License"
+  license_scan_lines: 20
