@@ -18,18 +18,15 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
 */
 
-#pragma once
-
+#include "units.hpp"
 #include "particles.hpp"
 
-namespace kinematics {
+namespace si {
 
-namespace Collision {
+namespace collision {
 
-  void _1D_collision(si::Particle *p1, si::Particle *p2);
-
-}
+void _1D_collision_particle(particle_t *p1, particle_t *p2);
 
 }
 
-
+}

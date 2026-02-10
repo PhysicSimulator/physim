@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
 
 EXT_DEFAULT = [".h", ".hpp", ".c", ".cc", ".cpp"]
 
@@ -33,10 +33,36 @@ FUNC_LINE_HAS_PAREN = re.compile(r"\)\s*(const)?\s*(noexcept)?\s*$")
 FUNC_LINE_HAS_OPEN_BRACE = re.compile(r"\)\s*(const)?\s*(noexcept)?\s*\{")
 CLASS_STRUCT_LINE = re.compile(r"^\s*(class|struct)\b")
 
+<<<<<<< HEAD
 # Preprocessor directives should be treated as code (i.e. not ignored like comments).
 COMMENT_OR_PREPROC = re.compile(r"^\s*(#)")
 
 LICENSE = "GNU General Public License"
+=======
+COMMENT_OR_PREPROC = re.compile(r"^\s*(//|/\*|\*|\*/|#)")
+
+LICENSE = """
+/* 
+ * -*- coding: utf-8 -*- 
+ * Copyright 2026 physim devlopers
+ *
+ * This file is part of physim.
+ *
+ * physim is free software: you can redistribute it and/or modify
+ * it under the term of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the license, or
+ * (at your option) any later version.
+ *
+ * physim is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
+*/
+"""
+>>>>>>> tests
 
 def load_simple_yaml(path: Path) -> dict[str, Any]:
     data: dict[str, Any] = {}
@@ -116,11 +142,16 @@ class Rules:
     class_name_capitalized: bool = True
 
     license_required_substring: str = LICENSE
+<<<<<<< HEAD
     license_scan_lines: int = 20 
+=======
+    license_scan_lines: int = 19
+>>>>>>> tests
 
 def err(rel: Path, line: int, msg: str) -> str:
     return f"{rel}:{line}: {msg}"
 
+<<<<<<< HEAD
 def strip_comments(text: str) -> list[str]:
     """Return per-line *code-only* strings with comments removed.
 
@@ -205,6 +236,8 @@ def strip_comments(text: str) -> list[str]:
     # Preserve the original number of lines (splitlines()) behavior.
     return ["".join(parts) for parts in out_lines]
 
+=======
+>>>>>>> tests
 def indent_columns(prefix: str, tab_width: int) -> int:
     cols = 0
     for ch in prefix:
@@ -288,6 +321,7 @@ def find_matching_brace_end(lines: list[str], start_i: int) -> int | None:
             return i
     return None
 
+<<<<<<< HEAD
 def check_blank_lines_around_definitions(rel: Path, code_lines: list[str], raw_lines: list[str]) -> list[str]:
     """Require a blank line before/after brace-delimited definitions.
 
@@ -301,10 +335,26 @@ def check_blank_lines_around_definitions(rel: Path, code_lines: list[str], raw_l
         if is_probable_class_struct_definition_start(code_lines, i) or is_probable_function_definition_start(code_lines, i):
             start = i
             end = find_matching_brace_end(code_lines, start)
+=======
+def check_blank_lines_around_definitions(rel: Path, lines: list[str]) -> list[str]:
+    errors: list[str] = []
+
+    # Find include block end to avoid forcing a blank line "before a definition"
+    # if it immediately follows include+required blank line.
+    include_idxs = [idx for idx, l in enumerate(lines) if l.startswith("#include")]
+    include_block_end = include_idxs[-1] if include_idxs else None
+
+    i = 0
+    while i < len(lines):
+        if is_probable_class_struct_definition_start(lines, i) or is_probable_function_definition_start(lines, i):
+            start = i
+            end = find_matching_brace_end(lines, start)
+>>>>>>> tests
             if end is None:
                 i += 1
                 continue
 
+<<<<<<< HEAD
             # blank line before
             if start > 0 and raw_lines[start - 1].strip() != "":
                 errors.append(err(rel, start + 1, "missing blank line before definition"))
@@ -312,6 +362,27 @@ def check_blank_lines_around_definitions(rel: Path, code_lines: list[str], raw_l
             # blank line after
             if end + 1 < len(raw_lines) and raw_lines[end + 1].strip() != "":
                 errors.append(err(rel, end + 2, "missing blank line after definition"))
+=======
+            # ---- blank line before start ----
+            # Don’t require if start is the first non-empty line after includes+blankline region.
+            prev_nonempty = None
+            for k in range(start - 1, -1, -1):
+                if lines[k].strip() != "":
+                    prev_nonempty = k
+                    break
+            # Require that the line directly above start is blank, unless we're at top-ish
+            if start > 0:
+                if lines[start - 1].strip() != "":
+                    # Allow: directly after include block if there was already a blank line rule
+                    # but the rule you want is: there *should* be empty lines before/after definitions,
+                    # so we enforce strictly (this is what you asked).
+                    errors.append(err(rel, start + 1, "missing blank line before definition"))
+
+            # ---- blank line after end ----
+            if end + 1 < len(lines):
+                if lines[end + 1].strip() != "":
+                    errors.append(err(rel, end + 1, "missing blank line after definition"))
+>>>>>>> tests
 
             i = end + 1
             continue
@@ -335,6 +406,7 @@ def check_file(repo_root: Path, file_path: Path, rules: Rules) -> list[str]:
     except UnicodeDecodeError:
         return errors
 
+<<<<<<< HEAD
     raw_lines = text.splitlines()
     code_lines = strip_comments(text)
     if len(code_lines) > len(raw_lines):
@@ -493,10 +565,38 @@ def check_file(repo_root: Path, file_path: Path, rules: Rules) -> list[str]:
                 errors.append(err(rel, lineno, "class name must start with capital letter"))
 
     # include blank line before/after include block
+=======
+    lines = text.splitlines()
+
+    # license
+    errors += check_license(rel, lines, rules)
+
+    # trailing whitespace, max line length, indentation rules
+    for i, l in enumerate(lines, 1):
+        if rules.forbid_trailing_whitespace and l.rstrip(" \t") != l:
+            errors.append(err(rel, i, "trailing whitespace"))
+
+        if rules.max_line_length > 0 and len(l) > rules.max_line_length:
+            errors.append(err(rel, i, f"line exceeds {rules.max_line_length} chars (got {len(l)})"))
+
+        leading_len = len(l) - len(l.lstrip(" \t"))
+        if leading_len > 0:
+            prefix = l[:leading_len]
+            if rules.indentation_tabs_only and " " in prefix:
+                errors.append(err(rel, i, "spaces used for indentation (tabs only)"))
+            if rules.indent_multiple_of > 0:
+                cols = indent_columns(prefix, rules.tab_width)
+                if cols % rules.indent_multiple_of != 0:
+                    errors.append(err(rel, i, f"indentation {cols} columns not multiple of {rules.indent_multiple_of}"))
+
+    # include blank line before/after include block
+    include_idxs = [idx for idx, l in enumerate(lines) if l.startswith("#include")]
+>>>>>>> tests
     if include_idxs:
         first = include_idxs[0]
         last = include_idxs[-1]
         if rules.require_blank_line_before_includes:
+<<<<<<< HEAD
             if first == 0 or (raw_lines[first - 1].strip() != "" and not raw_lines[first - 1].lstrip().startswith("#include")):
                 errors.append(err(rel, first + 1, "missing blank line before include block"))
         if rules.require_blank_line_after_includes:
@@ -506,6 +606,71 @@ def check_file(repo_root: Path, file_path: Path, rules: Rules) -> list[str]:
     # blank lines around *definitions* only (use code-only for detection)
     if rules.require_blank_lines_around_definitions:
         errors.extend(check_blank_lines_around_definitions(rel, code_lines, raw_lines))
+=======
+            if first == 0 or (lines[first - 1].strip() != "" and not lines[first - 1].strip().startswith("#include")):
+                errors.append(err(rel, first + 1, "missing blank line before include block"))
+        if rules.require_blank_line_after_includes:
+            if last + 1 >= len(lines) or (lines[last + 1].strip() != "" and not lines[last + 1].strip().startswith("#include")):
+                errors.append(err(rel, last + 1, "missing blank line after include block"))
+
+    # operator spacing
+    if rules.require_space_around_operators:
+        for i, l in enumerate(lines, 1):
+            if OPERATOR_RE.search(l):
+                errors.append(err(rel, i, "missing spaces around operator"))
+
+    # keyword spacing: after + before
+    if rules.require_space_after_keywords:
+        for i, l in enumerate(lines, 1):
+            if KW_AFTER_RE.search(l):
+                errors.append(err(rel, i, "missing space after keyword (use 'if (' / 'for (' etc.)"))
+            if ELSEIF_AFTER_RE.search(l):
+                errors.append(err(rel, i, "missing space in 'else if ('"))
+
+    if rules.require_space_before_keywords:
+        for i, l in enumerate(lines, 1):
+            m = KW_BEFORE_RE.search(l)
+            if m:
+                before = m.group(1)
+                kw = m.group(2)
+                errors.append(err(rel, i, f"missing space before keyword '{kw}' (after '{before}')"))
+
+    # brace spacing
+    if rules.require_space_around_braces:
+        for i, l in enumerate(lines, 1):
+            if "{" in l and not l.rstrip().endswith("{") and not l.rstrip().endswith("{;"):
+                if not re.search(r"\s\{", l):
+                    errors.append(err(rel, i, "missing space before '{'"))
+            if "}" in l and l.strip() != "}":
+                if not re.search(r"\}\s", l) and not l.rstrip().endswith("};"):
+                    errors.append(err(rel, i, "missing space after '}'"))
+
+    # pointer/reference style: allowed `int *var` / `int &var`
+    if rules.pointer_reference_style == "type_space_starvar":
+        for i, l in enumerate(lines, 1):
+            if BAD_PTR_REF_RE.search(l) or NO_SPACE_PTR_REF_RE.search(l) or SPACE_BETWEEN_PTR_REF_RE.search(l):
+                if not GOOD_PTR_REF_RE.search(l):
+                    errors.append(err(rel, i, "pointer/reference style: use 'int *var' / 'int &var'"))
+
+    # typedef struct suffix
+    for i, l in enumerate(lines, 1):
+        m = TYPEDEF_STRUCT_RE.search(l)
+        if m:
+            name = m.group(1)
+            if rules.typedef_struct_suffix and not name.endswith(rules.typedef_struct_suffix):
+                errors.append(err(rel, i, f"typedef struct name must end with '{rules.typedef_struct_suffix}'"))
+
+    # class naming
+    if rules.class_name_capitalized:
+        for i, l in enumerate(lines, 1):
+            m = CLASS_RE.search(l)
+            if m and not m.group(1)[0].isupper():
+                errors.append(err(rel, i, "class name must start with capital letter"))
+
+    # NEW: blank lines around *definitions* only
+    if rules.require_blank_lines_around_definitions:
+        errors.extend(check_blank_lines_around_definitions(rel, lines))
+>>>>>>> tests
 
     return errors
 
@@ -544,7 +709,11 @@ def main() -> int:
         typedef_struct_suffix=str(r.get("typedef_struct_suffix", "_t")),
         class_name_capitalized=bool(r.get("class_name_capitalized", True)),
         license_required_substring=str(r.get("license_required_substring", LICENSE)),
+<<<<<<< HEAD
         license_scan_lines=int(r.get("license_scan_lines", 20)),
+=======
+        license_scan_lines=int(r.get("license_scan_lines", 30)),
+>>>>>>> tests
     )
 
     all_errors: list[str] = []

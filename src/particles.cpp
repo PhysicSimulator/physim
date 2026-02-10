@@ -20,3 +20,8 @@
 
 #include "../include/particles.hpp"
 
+template<class F, class ...Args>
+void si::particle_t::set_v(F f, Args... args) {
+  this->v = f(args);
+}
+
