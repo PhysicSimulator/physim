@@ -18,30 +18,8 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
 */
 
-#pragma once
+#include "../include/collision.hpp"
 
-#include "units.hpp"
-#include "energie.hpp"
-
-namespace si {
-
-typedef struct particle_t {
-  Energie e{};
-  mass_t m{};
-  velocity_t v{};
-  momentum_t p{};
-
-  particle_t() = default;
-  explicit particle_t(Energie _e, mass_t _m, velocity_t _v, momentum_t _p)
-    : e(_e), m(_m), v(_v), p(_p) {}
-
-  inline void momentum() {
-    this->p = this->m * this->v;
-  }
-
-  template<class F, class... Args>
-  void set_v(F f, Args... args);
+void si::collision::_1D_collision_particle(si::particle_t *pi, si::particle_t *p2) {
   
-} particle_t;
-
 }
