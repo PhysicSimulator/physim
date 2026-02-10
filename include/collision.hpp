@@ -18,7 +18,6 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
 */
 
-#include "units.hpp"
 #include "particles.hpp"
 
 namespace si {
@@ -27,6 +26,6 @@ namespace collision {
 
 void _1D_collision_particle(particle_t *p1, particle_t *p2);
 
-}
+} // namespace collision
 
-}
+} // namespace si

@@ -21,5 +21,5 @@
 #include "../include/collision.hpp"
 
 void si::collision::_1D_collision_particle(si::particle_t *pi, si::particle_t *p2) {
-  
+    
 }

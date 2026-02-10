@@ -18,7 +18,7 @@ SpaceBeforeParens: ControlStatements
 SpacesInParentheses: false
 SpaceInEmptyParentheses: false
 
-PointerAlignment: Left
+PointerAlignment: Right
 ReferenceAlignment: Pointer
 
 SortIncludes: true
