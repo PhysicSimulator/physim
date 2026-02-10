@@ -22,6 +22,7 @@
 
 #include "units.hpp"
 #include "energie.hpp"
+#include <functional>
 
 namespace si {
 
@@ -41,6 +42,8 @@ typedef struct particle_t {
   }
 
   template<class F, class... Args>
+  requires  std::invocable<F, Args...> &&
+            std::assignable_from<si::velocity_t&, std::invoke_result_t<F&, Args...>>
   void set_v(F f, Args... args);
   
 } particle_t;
