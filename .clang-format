@@ -5,7 +5,7 @@ Language: Cpp
 ColumnLimit: 88
 
 # Identation: tabs-only, and treat a tab as 2 spaces visually
-UseTab: forIndentation
+UseTab: ForIndentation
 IndentWidth: 2
 TabWidth:   2
 ContinuationIndentWidth: 2
