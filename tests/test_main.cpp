@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
-*/
+ */
 
 #include "test_support.h"
 

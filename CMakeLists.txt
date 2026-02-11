@@ -13,7 +13,9 @@ option(PHYSIM_TESTING "Build tests" ON)
 add_library(physim 
   #${CMAKE_CURRENT_SOURCE_DIR}/src
   src/energie.cpp
-  src/kinematics.cpp
+  src/collision.cpp
+  src/energie.cpp
+  src/units.cpp
 )
 
 target_include_directories(physim PUBLIC 

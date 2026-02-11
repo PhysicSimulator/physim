@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
-*/
+ */
 
 #pragma once
 
@@ -78,7 +78,7 @@ namespace tests {
   inline void reset_current_test_failures() { failures_in_current_test() = 0; }
 
   inline int current_test_failure() { return failures_in_current_test(); }
-}
+} // namespace tests
 
 // --- token concatenation helpers (2-step expansion) ---
 #define T_CONCAT_IMPL(a, b) a##b

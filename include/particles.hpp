@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
-*/
+ */
 
 #pragma once
 
@@ -35,12 +35,10 @@ typedef struct particle_t {
 
   particle_t() = default;
   explicit particle_t(Energie _e, mass_t _m, velocity_t _v, momentum_t _p)
-    : e(_e), m(_m), v(_v), p(_p) {}
+      : e(_e), m(_m), v(_v), p(_p) {}
 
 
-  inline void momentum() {
-    this->p = this->m * this->v;
-  }
+  inline void momentum() { this->p = this->m * this->v; }
 
   template<class F, class... Args>
   requires  std::invocable<F, Args...> &&
@@ -49,4 +47,5 @@ typedef struct particle_t {
   
 } particle_t;
 
-}
+} // namespace si
+

@@ -16,10 +16,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
-*/
+ */
 
+#include "particles.hpp"
 #include "test_support.h"
-#include "kinematics.hpp"
+#include "collision.hpp"
 #include "energie.hpp"
 
 namespace TestKinematics {
@@ -30,8 +31,8 @@ private:
   si::mass_t _m;
   si::velocity_t _v;
   si::momentum_t _p;
-  si::Particle p1{};
-  si::Particle p2{};
+  si::particle_t p1{};
+  si::particle_t p2{};
 
 public:
   TestCollision() {
@@ -39,7 +40,7 @@ public:
     _m = si::mass_t{10.0};
     _v = si::velocity_t{10.0};
     _p = si::momentum_t{100};
-    p1 = si::Particle(
+    p1 = si::particle_t(
       si::Energie(_E),
       si::mass_t(_m),
       si::velocity_t(_v),
@@ -49,12 +50,12 @@ public:
   }
 
   void test_1D_collision() {
-    kinematics::Collision::_1D_collision(&p1, &p2);
-    EXPECT_NEAR(p1.momentum().raw(), 100.0, 1e-9);
-    EXPECT_NEAR(p2.momentum().raw(), 100.0, 1e-9);
+    si::collision::_1D_collision_particle(&p1, &p2);
+    EXPECT_NEAR(p1.p.raw(), 100.0, 1e-9);
+    EXPECT_NEAR(p2.p.raw(), 100.0, 1e-9);
   }
 };
 
-}
+} // namespace TestKinematics
 
 TEST_METHOD(TestKinematics::TestCollision, test_1D_collision)
