@@ -20,8 +20,9 @@
 
 #pragma once
 
-#include "units.hpp"
 #include "energie.hpp"
+#include "units.hpp"
+
 #include <functional>
 
 namespace si {

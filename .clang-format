@@ -1,34 +1,9 @@
 
+BasedOnStyle: LLVM
 Language: Cpp
 
-# Line length
 ColumnLimit: 88
-
-# Identation: tabs-only, and treat a tab as 2 spaces visually
-UseTab: ForIndentation
 IndentWidth: 2
-TabWidth:   2
-ContinuationIndentWidth: 2
-
-# Braces
-BreakBeforeBraces: Attach
-
-SpaceBeforeParens: ControlStatements
-
-SpacesInParentheses: false
-SpaceInEmptyParentheses: false
-
 PointerAlignment: Right
 ReferenceAlignment: Pointer
-
-SortIncludes: true
-IncludeBlocks: Regroup
-
-BinPackParameters: false
-BinPackArguments: false
-
-AlwaysBreakTemplateDeclarations: Yes
-
-ReflowComments: false
-FixNamespaceComments: true
 
