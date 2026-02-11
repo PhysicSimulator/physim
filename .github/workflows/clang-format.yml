@@ -16,11 +16,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang-format
 
-      - name: Check formatting (no changes)
+      - name: Check clang-format and show diff
+        shell: bash
         run: |
-          FILES=$(git ls-files '*.c' '*.cpp' '*.h' '*.hpp')
-          if [ -z "$FILES" ]; then
-            echo "No C/C++ files found."
-            exit 0
-          fi
-          clang-format --dry-run --Werror $FILES
+          set -euo pipefail
+          FILES=$(git ls-files '*.c' '*.cc' '*.cpp' '*.cxx' '*.h' '*.hh' '*.hpp' '*.hxx')
+          bad=0
+          for f in $FILES; do
+            if ! diff -u "$f" <(clang-format -style=file "$f"); then
+              bad=1
+            fi
+          done
+          exit $bad
