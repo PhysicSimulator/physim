@@ -15,7 +15,6 @@ jobs:
   build-test:
     name: Build & test (${{ matrix.os  }}, ${{ matrix.build_type }})
     runs-on: ${{ matrix.os }}
-    needs: [ format ]
     strategy:
       fail-fast: false
       matrix:
