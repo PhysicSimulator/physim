@@ -18,9 +18,8 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
  */
 
+#include <physim/physim.hpp>
 #include "test_support.h"
-#include "units.hpp"
-#include "energie.hpp"
 #include <type_traits>
 
 class TestUnit {
@@ -70,7 +69,7 @@ public:
 
   void test_classical_mechanic() {
     EXPECT_NEAR(
-        si::classical_mechanic(si::mass_t { 10.0 }, si::velocity_t { 10.0 }).raw(),
+        e.classical_mechanic(si::mass_t { 10.0 }, si::velocity_t { 10.0 })->raw(),
         500.0,
         1e-12);
   }

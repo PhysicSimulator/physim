@@ -18,12 +18,12 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
  */
 
-#include "../include/particles.hpp"
+#include <physim/particles.hpp>
 
 template<class F, class ...Args>
 requires  std::invocable<F, Args...> &&
           std::assignable_from<si::velocity_t&, std::invoke_result_t<F&, Args...>>
-void si::particle_t::set_v(F f, Args... args) {
+void si::particle_t::set_v(F&& f, Args&&... args) {
   this->v = std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
 }
 

@@ -68,3 +68,55 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
+  installed-consumer:
+    name: Installed consumer (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: [ build-test ]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew udate
+          brew install ninja
+
+      - name: Build physim (Release)
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DPHYSIM_TESTING=OFF
+          -DPHYSIM_WARNINGS_AS_ERRORS=ON
+          -DPHYSIM_ENABLE_SANITIZERS=OFF
+        
+      - name: Compile physim
+        run: cmake --build build --parallel
+
+      - name: Install physim to staging prefix
+        run: cmake --install build --prefix "${{ github.workspace }}/_install"
+
+      - name: Configure installed consumer
+        run: >
+          cmake -S tests/installed -B build-consumer -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}_install"
+
+      - name: Build installed consumer
+        run: cmake --build build-consumer --parallel
+
+      - name: Run installed consumer
+        run: |
+          ./build-consumer/consumer
+

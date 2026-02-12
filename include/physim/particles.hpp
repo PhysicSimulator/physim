@@ -20,25 +20,34 @@
 
 #pragma once
 
+#include "energie.hpp"
 #include "units.hpp"
+
+#include <functional>
 
 namespace si {
 
-using ekin_t = energie_t;
-using epot_t = energie_t;
+typedef struct particle_t {
+  ekin_t ekin{};
+  epot_t epot{};
+  mass_t m{};
+  velocity_t v{};
+  momentum_t p{};
 
-class Energie {
-private:
-  ekin_t kinetic{};
-  epot_t potential{};
+  particle_t() = default;
+  explicit particle_t(ekin_t _ekin, epot_t _epot, mass_t _m, velocity_t _v, momentum_t _p)
+      : ekin(_ekin), epot(_epot), m(_m), v(_v), p(_p) {}
 
-public:
-  Energie() = default;
-  Energie(ekin_t _kinetic);
-  inline ekin_t& ekin() noexcept { return kinetic; }
-  inline epot_t epot() noexcept { return potential; }
-};
 
-ekin_t classical_mechanic(si::mass_t m, si::velocity_t v);
+  inline void momentum() { this->p = this->m * this->v; }
+  inline void ekin_CM() { this->ekin.classical_mechanic(this->m, this->v); }
+
+  template<class F, class... Args>
+  requires  std::invocable<F, Args...> &&
+            std::assignable_from<si::velocity_t&, std::invoke_result_t<F&, Args...>>
+  void set_v(F&& f, Args&&... args);
+  
+} particle_t;
 
 } // namespace si
+

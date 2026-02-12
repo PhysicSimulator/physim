@@ -18,5 +18,5 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
  */
 
-#include "../include/units.hpp"
+#include <physim/units.hpp>
 

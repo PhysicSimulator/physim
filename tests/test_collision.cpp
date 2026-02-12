@@ -18,16 +18,13 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
  */
 
-#include "particles.hpp"
+#include <physim/physim.hpp>
 #include "test_support.h"
-#include "collision.hpp"
-#include "energie.hpp"
-
-namespace TestKinematics {
 
 class TestCollision {
 private:
-  si::ekin_t _E;
+  si::ekin_t _ekin;
+  si::epot_t _epot;
   si::mass_t _m;
   si::velocity_t _v;
   si::momentum_t _p;
@@ -36,26 +33,33 @@ private:
 
 public:
   TestCollision() {
-    _E = si::ekin_t{500.0};
+    _ekin = si::ekin_t{500.0};
+    _epot = si::epot_t{};
     _m = si::mass_t{10.0};
     _v = si::velocity_t{10.0};
     _p = si::momentum_t{100};
     p1 = si::particle_t(
-      si::Energie(_E),
-      si::mass_t(_m),
-      si::velocity_t(_v),
-      si::momentum_t(_p)
+      _ekin,
+      _epot,
+      _m,
+      _v,
+      _p
     );
     p2 = p1;
   }
 
   void test_1D_collision() {
     si::collision::_1D_collision_particle(&p1, &p2);
+    // p1
+    EXPECT_NEAR(p1.v.raw(), 10.0, 1e-9);
     EXPECT_NEAR(p1.p.raw(), 100.0, 1e-9);
+    EXPECT_NEAR(p1.ekin.raw(), 500.0, 1e-9);
+
+    // p2
+    EXPECT_NEAR(p2.v.raw(), 10.0, 1e-9);
     EXPECT_NEAR(p2.p.raw(), 100.0, 1e-9);
+    EXPECT_NEAR(p2.ekin.raw(), 500.0, 1e-9);
   }
 };
 
-} // namespace TestKinematics
-
-TEST_METHOD(TestKinematics::TestCollision, test_1D_collision)
+TEST_METHOD(TestCollision, test_1D_collision)
