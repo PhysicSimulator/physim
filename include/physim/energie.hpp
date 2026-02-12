@@ -25,12 +25,7 @@
 namespace si {
 
 typedef struct ekin_t : energie_t {
-  energie_t ekin{};
-
-  ekin_t() = default;
-  ekin_t(double _ekin) : ekin(_ekin) {}
-  ekin_t(energie_t _ekin) : ekin(_ekin) {}
-
+  using energie_t::unit_t;
   ekin_t *classical_mechanic(si::mass_t m, si::velocity_t v);
 } ekin_t;
 

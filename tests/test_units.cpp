@@ -49,7 +49,7 @@ TEST_METHOD(TestUnit, compile_time_properties)
 
 class TestEkin {
 private:
-  si::ekin_t e;
+  si::ekin_t e{};
 
 public:
   void default_construct_is_zero() {

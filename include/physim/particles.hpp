@@ -42,10 +42,12 @@ typedef struct particle_t {
   inline void momentum() { this->p = this->m * this->v; }
   inline void ekin_CM() { this->ekin.classical_mechanic(this->m, this->v); }
 
-  template<class F, class... Args>
+  template<class F, class ...Args>
   requires  std::invocable<F, Args...> &&
             std::assignable_from<si::velocity_t&, std::invoke_result_t<F&, Args...>>
-  void set_v(F&& f, Args&&... args);
+  void set_v(F&& f, Args&&... args) {
+  this->v = std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
+}
   
 } particle_t;
 
