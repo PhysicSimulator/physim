@@ -13,8 +13,8 @@ option(PHYSIM_ENABLE_COVERAGE "Enable coverage reporting" OFF)
 if(PHYSIM_ENABLE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   message(STATUS "Coverage enabled")
 
-  add_compile_options(--coverage -O0 -g)
-  add_link_options(--coverage)
+  add_compile_options(physim PRIVATE --coverage -O0 -g)
+  add_link_options(physim PRIVATE --coverage)
 endif()
 
 # --------------- Library ---------------
