@@ -8,6 +8,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(PHYSIM_WARNINGS_AS_ERRORS "Warnings as errors" ON)
 option(PHYSIM_ENABLE_SANITIZERS "Enable ASan/UBSan in Debug" ON)
 option(PHYSIM_TESTING "Build tests" ON)
+option(PHYSIM_ENABLE_COVERAGE "Enable coverage reporting" OFF)
+
+if(PHYSIM_ENABLE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  message(STATUS "Coverage enabled")
+
+  add_compile_options(--coverage -O0 -g)
+  add_link_options(--coverage)
+endif()
 
 # --------------- Library ---------------
 add_library(physim 
