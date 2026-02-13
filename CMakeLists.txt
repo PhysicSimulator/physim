@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(physim VERSION 0.1 LANGUAGES CXX)
+project(physim VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -11,16 +11,21 @@ option(PHYSIM_TESTING "Build tests" ON)
 
 # --------------- Library ---------------
 add_library(physim 
-  #${CMAKE_CURRENT_SOURCE_DIR}/src
   src/energie.cpp
-  src/kinematics.cpp
+  src/collision.cpp
+  src/energie.cpp
+  src/units.cpp
 )
 
-target_include_directories(physim PUBLIC 
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+add_library(physim::physim ALIAS physim)
 
 target_compile_features(physim PUBLIC cxx_std_23)
+
+target_include_directories(physim
+  PUBLIC 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 
 # --------------- Strict compile flags ---------------
 function(physim_apply_strict_flags tgt)
@@ -40,6 +45,7 @@ function(physim_apply_strict_flags tgt)
       -fno-omit-frame-pointer
       -fstack-protector-strong
     )
+
     if (PHYSIM_WARNINGS_AS_ERRORS)
       target_compile_options(${tgt} PRIVATE -Werror)
     endif()
@@ -57,14 +63,12 @@ function(physim_apply_sanitizers tgt)
   if (NOT PHYSIM_ENABLE_SANITIZERS)
     return()
   endif()
-  if (MSVC)
-    return()
-  endif()
 
   target_compile_options(${tgt} PRIVATE
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>
     $<$<CONFIG:Debug>:-fno-sanitize-recover=all>
   )
+
   target_link_options(${tgt} PRIVATE
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>
   )
@@ -72,27 +76,87 @@ endfunction()
 
 physim_apply_sanitizers(physim)
 
+# --------------- Installation ---------------
+include(GNUInstallDirs)
+
+install(TARGETS physim
+  EXPORT physimTargets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Export targets
+install(EXPORT physimTargets
+  FILE physimTargets.cmake
+  NAMESPACE physim::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/physim
+)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/physimConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/physimConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/physim
+)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/physimConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/physimConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/physimConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/physim
+)
+
 # --------------- Testing ---------------
 include(CTest)
 
+set(BUILD_TESTING ${PHYSIM_TESTING} CACHE BOOL "Build tests" FORCE)
+
 if (BUILD_TESTING)
-  #file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_*.cpp)
-  #add_executable(physim_tests ${TEST_SOURCES})
-  add_executable(physim_tests
-    tests/test_units.cpp
-    tests/test_main.cpp
-    tests/test_kinematic.cpp
+  enable_testing()
+
+  set(PHYSIM_TEST_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_main.cpp)
+
+  file(GLOB TEST_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_*.cpp
   )
 
-  target_link_libraries(physim_tests PRIVATE physim)
-  target_include_directories(physim_tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/tests
-  )
-  target_compile_features(physim_tests PRIVATE cxx_std_23)
+  foreach(test_src ${TEST_SOURCES})
+    get_filename_component(test_name ${test_src} NAME_WE)
 
-  physim_apply_strict_flags(physim_tests)
-  physim_apply_sanitizers(physim_tests)
+    # Skip test_main.cpp
+    if (test_src STREQUAL PHYSIM_TEST_MAIN)
+      continue()
+    endif()
 
-  add_test(NAME physim_tests COMMAND physim_tests)
+    add_executable(${test_name}
+      ${PHYSIM_TEST_MAIN}
+      ${test_src}
+    )
+
+    target_link_libraries(${test_name} PRIVATE physim::physim)
+
+    target_include_directories(${test_name} PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests
+    )
+
+    target_compile_features(${test_name} PRIVATE cxx_std_23)
+
+    physim_apply_strict_flags(${test_name})
+    physim_apply_sanitizers(${test_name})
+
+    add_test(NAME ${test_name} COMMAND ${test_name})
+  endforeach()
 endif()
+

@@ -18,5 +18,20 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
  */
 
-#include <physim/particles.hpp>
+#include <physim/collision.hpp>
 
+si::velocity_t after_collision(si::particle_t *p1, si::particle_t *p2) {
+  return (2 * ((p1->m * p1->v) + (p2->m * p2->v)) / (p1->m + p2->m)) - p1->v;
+}
+
+void si::collision::_1D_collision_particle(si::particle_t *p1, si::particle_t *p2) {
+  // p1:
+  p1->set_v(after_collision, p1, p2); 
+  p1->momentum();
+  p1->ekin_CM();
+
+  // p2:
+  p2->set_v(after_collision, p2, p1);
+  p2->momentum();
+  p2->ekin_CM();
+}

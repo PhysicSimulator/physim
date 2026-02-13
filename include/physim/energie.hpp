@@ -18,5 +18,24 @@
  * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
  */
 
-#include <physim/particles.hpp>
+#pragma once
 
+#include "units.hpp"
+
+namespace si {
+
+typedef struct ekin_t : energie_t {
+  using energie_t::unit_t;
+  ekin_t *classical_mechanic(si::mass_t m, si::velocity_t v);
+} ekin_t;
+
+typedef struct epot_t : energie_t {
+  energie_t epot{};
+
+  epot_t() = default;
+  epot_t(double _epot) : epot(_epot) {}
+  epot_t(energie_t _epot) : epot(_epot) {}
+} epot_t;
+
+
+} // namespace si

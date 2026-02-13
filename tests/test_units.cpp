@@ -1,7 +1,25 @@
+/* 
+ * -*- coding: utf-8 -*- 
+ * Copyright 2026 physim devlopers
+ *
+ * This file is part of physim.
+ *
+ * physim is free software: you can redistribute it and/or modify
+ * it under the term of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the license, or
+ * (at your option) any later version.
+ *
+ * physim is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
+ */
 
+#include <physim/physim.hpp>
 #include "test_support.h"
-#include "units.hpp"
-#include "energie.hpp"
 #include <type_traits>
 
 class TestUnit {
@@ -31,7 +49,7 @@ TEST_METHOD(TestUnit, compile_time_properties)
 
 class TestEkin {
 private:
-  si::ekin_t e;
+  si::ekin_t e{};
 
 public:
   void default_construct_is_zero() {
@@ -51,7 +69,7 @@ public:
 
   void test_classical_mechanic() {
     EXPECT_NEAR(
-        si::classical_mechanic(si::mass_t{10.0}, si::velocity_t{10.0}).raw(),
+        e.classical_mechanic(si::mass_t { 10.0 }, si::velocity_t { 10.0 })->raw(),
         500.0,
         1e-12);
   }

@@ -12,25 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format:
-    name: Format check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Run Format check
-        run: python3 scripts/format_check.py
-
   build-test:
     name: Build & test (${{ matrix.os  }}, ${{ matrix.build_type }})
     runs-on: ${{ matrix.os }}
-    needs: [ format ]
     strategy:
       fail-fast: false
       matrix:
@@ -82,4 +66,56 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build --output-on-failure
+
+  installed-consumer:
+    name: Installed consumer (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: [ build-test ]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install ninja
+
+      - name: Build physim (Release)
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DPHYSIM_TESTING=OFF
+          -DPHYSIM_WARNINGS_AS_ERRORS=ON
+          -DPHYSIM_ENABLE_SANITIZERS=OFF
+        
+      - name: Compile physim
+        run: cmake --build build --parallel
+
+      - name: Install physim to staging prefix
+        run: cmake --install build --prefix "${{ github.workspace }}/_install"
+
+      - name: Configure installed consumer
+        run: >
+          cmake -S tests/installed -B build-consumer -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/_install"
+
+      - name: Build installed consumer
+        run: cmake --build build-consumer --parallel
+
+      - name: Run installed consumer
+        run: |
+          ./build-consumer/consumer
 

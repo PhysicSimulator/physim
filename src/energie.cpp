@@ -1,11 +1,27 @@
+/*
+ * -*- coding: utf-8 -*-
+ * Copyright 2026 physim devlopers
+ *
+ * This file is part of physim.
+ *
+ * physim is free software: you can redistribute it and/or modify
+ * it under the term of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the license, or
+ * (at your option) any later version.
+ *
+ * physim is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with physim. If not, see <https:://www.gnu.org/license/#GPL>
+ */
 
-#include "../include/energie.hpp"
+#include <physim/energie.hpp>
 
-si::Energie::Energie(si::ekin_t _kinetic) {
-  this->kinetic = _kinetic;
-}
-
-si::ekin_t si::classical_mechanic(si::mass_t m, si::velocity_t v) {
-  return 0.5 * m * v * v;
+si::ekin_t *si::ekin_t::classical_mechanic(si::mass_t m, si::velocity_t v) {
+  this->u = (0.5 * m * v * v).raw();
+  return this;
 }
 
